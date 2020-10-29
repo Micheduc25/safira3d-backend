@@ -1,0 +1,4 @@
+{
+    "name":"Safira3d Development",
+    "db_url":"mongodb://localhost/safira3d"
+}

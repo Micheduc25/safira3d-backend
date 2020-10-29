@@ -1,0 +1,42 @@
+const express = require("express");
+const helmet = require("helmet");
+const morgan = require("morgan");
+const modulesRouter = require("./routes/modules");
+const usersRouter = require("./routes/users");
+const authRouter = require("./routes/auth");
+const db = require("./db/initDB");
+const path = require("path");
+const config = require("config");
+const app = express();
+
+if (!config.get("jwtSecretKey")) {
+  //if our jwt secret key is not set we exit the application
+  console.error("FATAL ERROR JWT KEY NOT SET!");
+  process.exit(1);
+}
+//middleware
+app.use(express.json());
+app.use("/public", express.static(path.join(__dirname, "/public")));
+
+app.use(helmet());
+
+if (app.get("env") === "development") {
+  app.use(morgan("tiny"));
+}
+
+app.get("/", (req, res) => {
+  res.send("Hello World!");
+});
+
+//  routes here
+app.use("/api/modules", modulesRouter);
+app.use("/api/users", usersRouter);
+app.use("/api/auth", authRouter);
+
+db.connectDB();
+
+//start listening here
+const port = process.env.PORT || 5000;
+app.listen(port, () => {
+  console.log("server running at ", port);
+});
