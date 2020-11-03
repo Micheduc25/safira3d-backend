@@ -6,6 +6,10 @@ const {
   updateModule,
   deleteModule,
   imagesUpload,
+  likeModule,
+  unlikeModule,
+  viewModule,
+  rateModule,
 } = require("../controllers/ModuleController");
 
 const Joi = require("joi");
@@ -103,29 +107,76 @@ router.put("/:id", [auth, imagesUpload], async (req, res) => {
         updateFields.background_image =
           filePath + req.files.background_image[0].filename;
       }
-      const result = await updateModule(req.params.id, updateFields);
+      const result = await updateModule(req.params.id, updateFields, req.user);
       res.send({
         message: "successfully updated module",
         data: result,
       });
     } catch (err) {
-      res.status(500).send(err);
+      res.status(err.code).send(err.error);
     }
   } else res.status(422).send("The id sent was invalid");
 });
 
-router.delete("/:id", async (req, res) => {
+router.put("/like/:id", auth, async (req, res) => {
+  const id = req.params.id;
+  const userId = req.user._id;
+
+  try {
+    const result = await likeModule(id, userId);
+    res.send(result.message);
+  } catch (err) {
+    res.status(err.code).send(err.error);
+  }
+});
+router.put("/unlike/:id", auth, async (req, res) => {
+  const id = req.params.id;
+  const userId = req.user._id;
+
+  try {
+    const result = await unlikeModule(id, userId);
+    res.send(result.message);
+  } catch (err) {
+    res.status(err.code).send(err.error);
+  }
+});
+router.put("/view/:id", auth, async (req, res) => {
+  const id = req.params.id;
+  const userId = req.user._id;
+
+  try {
+    const result = await viewModule(id, userId);
+    res.send(result.message);
+  } catch (err) {
+    res.status(err.code).send(err.error);
+  }
+});
+
+router.put("/rate/:id", auth, async (req, res) => {
+  const id = req.params.id;
+  const userId = req.user._id;
+  const value = req.body.rating;
+
+  try {
+    const result = await rateModule(id, userId, value);
+    res.send(result);
+  } catch (err) {
+    res.status(err.code).send(err.error);
+  }
+});
+
+router.delete("/:id", auth, async (req, res) => {
   const { error } = Joi.string().min(1).validate(req.params.id);
 
   if (!error) {
     try {
-      const result = await deleteModule(req.params.id);
+      const result = await deleteModule(req.params.id, req.user);
       res.send({
         message: "successfully deleted module",
         deleted_data: result,
       });
     } catch (err) {
-      res.status(500).send(err);
+      res.status(err.code).send(err.error);
     }
   } else res.status(422).send("The id sent was invalid");
 });

@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 const Joi = require("joi");
+const { User } = require("./User");
 
 const safiraModuleSchema = new mongoose.Schema({
   title: {
@@ -14,6 +15,34 @@ const safiraModuleSchema = new mongoose.Schema({
   location: {
     type: String,
     required: true,
+  },
+  rating: {
+    type: Number,
+    min: 0,
+    max: 5,
+    default: 0,
+  },
+
+  raters: {
+    type: [String],
+    default: [],
+  },
+  likes: {
+    type: Number,
+    default: 0,
+  },
+  likers: {
+    type: [String],
+    default: [],
+  },
+  views: {
+    type: Number,
+    default: 0,
+  },
+
+  viewers: {
+    type: [String],
+    default: [],
   },
   main_color: String,
   secondary_color: String,
@@ -63,6 +92,11 @@ function validateModule(module) {
     foreground_image: Joi.string().required(),
     background_image: Joi.string().required(),
     creator: Joi.string().required(),
+    rating: Joi.number().min(0).max(5),
+    likes: Joi.number().min(0),
+    views: Joi.number().min(0),
+    likers: Joi.array(),
+    viewers: Joi.array(),
   }).validate(module);
 }
 
@@ -76,7 +110,12 @@ function validateUpdateModule(updateData) {
     categories: Joi.array().min(1),
     foreground_image: Joi.string(),
     background_image: Joi.string(),
-    creator: Joi.string().required(),
+    creator: Joi.string(),
+    rating: Joi.number().min(0).max(5),
+    likes: Joi.number().min(0),
+    views: Joi.number().min(0),
+    likers: Joi.array(),
+    viewers: Joi.array(),
   })
     .or(
       "title",
@@ -86,10 +125,12 @@ function validateUpdateModule(updateData) {
       "secondary_color",
       "categories",
       "foreground_image",
-        "background_image",
-      "creator"
+      "background_image",
+      "creator",
+      "rating",
+      "likers",
+      "viewers"
     )
-
     .validate(updateData);
 }
 exports.SafiraModule = SafiraModule;
