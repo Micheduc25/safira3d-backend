@@ -1,4 +1,7 @@
 {
     "name":"Safira3d Development",
-    "db_url":"mongodb://localhost/safira3d"
+    "db_url":"mongodb://localhost/safira3d",
+    "main_url":"http://localhost:3000",
+    "email":"ndjockjunior@gmail.com",
+    "mailProvider":"gmail"
 }

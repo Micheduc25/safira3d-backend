@@ -1,4 +1,5 @@
 {
-    "jwtSecretKey":"safira3d_jwtSecretKey"
+    "jwtSecretKey":"safira3d_jwtSecretKey",
+    "mailPassword":"safira3d_mailPassword"
 
 }

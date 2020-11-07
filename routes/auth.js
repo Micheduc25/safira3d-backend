@@ -3,7 +3,11 @@ const auth = require("../middleware/auth");
 const { getUser } = require("../controllers/UserController");
 
 const router = express.Router();
-const { loginUser } = require("../controllers/AuthController");
+const {
+  loginUser,
+  resetPassword,
+  confirmPasswordReset,
+} = require("../controllers/AuthController");
 router.post("/login", async (req, res) => {
   try {
     const result = await loginUser(req.body);
@@ -25,6 +29,30 @@ router.get("/me", auth, async (req, res) => {
 
 router.post("/logout", (req, res) => {
   res.send({ message: "success" });
+});
+
+router.post("/password/reset", async (req, res) => {
+  //  body should contain email and new password
+  const data = req.body;
+
+  try {
+    await resetPassword(data.email, data.newpassword);
+    res.json(`reset email has been sent to ${data.email}!`);
+  } catch (err) {
+    res.status(err.code).send(err.error);
+  }
+});
+
+router.get("/password/confirm-reset", async (req, res) => {
+  const code = req.query.code;
+  const email = req.query.email;
+
+  try {
+    await confirmPasswordReset(email, code);
+    res.send("Votre Mot de passe a été réinitialisé avec succès");
+  } catch (err) {
+    res.status(err.code).send(err.error);
+  }
 });
 
 module.exports = router;

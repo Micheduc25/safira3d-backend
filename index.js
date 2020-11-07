@@ -4,6 +4,8 @@ const morgan = require("morgan");
 const modulesRouter = require("./routes/modules");
 const usersRouter = require("./routes/users");
 const authRouter = require("./routes/auth");
+const visiteRouter = require("./routes/visites");
+const downloadRouter = require('./routes/download');
 const db = require("./db/initDB");
 const path = require("path");
 const config = require("config");
@@ -32,6 +34,8 @@ app.get("/", (req, res) => {
 app.use("/api/modules", modulesRouter);
 app.use("/api/users", usersRouter);
 app.use("/api/auth", authRouter);
+app.use("/api/download", downloadRouter);
+app.use("/public/visites", visiteRouter);
 
 db.connectDB();
 

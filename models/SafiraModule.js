@@ -77,6 +77,16 @@ const safiraModuleSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: "User",
   },
+
+  visit_url: {
+    type: String,
+    required: true,
+  },
+
+  is_complete: {
+    type: Boolean,
+    default: true,
+  },
 });
 
 const SafiraModule = mongoose.model("SafiraModule", safiraModuleSchema);
@@ -97,6 +107,8 @@ function validateModule(module) {
     views: Joi.number().min(0),
     likers: Joi.array(),
     viewers: Joi.array(),
+    is_complete: Joi.boolean(),
+    visit_url: Joi.string().required(),
   }).validate(module);
 }
 
@@ -116,6 +128,8 @@ function validateUpdateModule(updateData) {
     views: Joi.number().min(0),
     likers: Joi.array(),
     viewers: Joi.array(),
+    visit_url: Joi.string(),
+    is_complete: Joi.boolean(),
   })
     .or(
       "title",
@@ -129,7 +143,9 @@ function validateUpdateModule(updateData) {
       "creator",
       "rating",
       "likers",
-      "viewers"
+      "viewers",
+      "visit_url",
+      "is_complete"
     )
     .validate(updateData);
 }
