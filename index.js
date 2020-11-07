@@ -5,10 +5,11 @@ const modulesRouter = require("./routes/modules");
 const usersRouter = require("./routes/users");
 const authRouter = require("./routes/auth");
 const visiteRouter = require("./routes/visites");
-const downloadRouter = require('./routes/download');
+const downloadRouter = require("./routes/download");
 const db = require("./db/initDB");
 const path = require("path");
 const config = require("config");
+require("dotenv").config();
 const app = express();
 
 if (!config.get("jwtSecretKey")) {
@@ -40,7 +41,7 @@ app.use("/public/visites", visiteRouter);
 db.connectDB();
 
 //start listening here
-const port = process.env.PORT || 5000;
+const port = process.env.PORT || 3000;
 app.listen(port, () => {
   console.log("server running at ", port);
 });
