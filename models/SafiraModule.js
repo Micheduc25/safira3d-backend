@@ -147,7 +147,8 @@ function validateUpdateModule(updateData) {
       "visit_url",
       "is_complete"
     )
-    .validate(updateData);
+    .validate(updateData
+    );
 }
 exports.SafiraModule = SafiraModule;
 exports.validateModule = validateModule;
