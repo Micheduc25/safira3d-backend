@@ -6,11 +6,7 @@ function connectDB() {
       useNewUrlParser: true,
     })
     .then(() => {
-      console.log(
-        "connected to MongoDB==>",
-        process.env.MONGODB_URI,
-        config.get("db_url")
-      );
+      console.log("connected to MongoDB");
     })
     .catch((err) => {
       console.error("OOps could not connect to mongodb", err);

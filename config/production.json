@@ -1,7 +1,6 @@
 {
     "name":"Safira3d Production",
     "main_url":"http://safira3d.com",
-    "db_url":"mongodb+srv://safira3d:michra25@cluster0.9gej1.mongodb.net/safira3d?retryWrites=true&w=majority",
     "email":"ndjockjunior@gmail.com",
     "mailProvider":"gmail"
 
