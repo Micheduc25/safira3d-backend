@@ -12,6 +12,7 @@ const config = require("config");
 require("dotenv").config();
 const app = express();
 
+const { connectDB } = require("./db/initDB");
 if (!config.get("jwtSecretKey")) {
   //if our jwt secret key is not set we exit the application
   console.error("FATAL ERROR JWT KEY NOT SET!");
@@ -38,7 +39,9 @@ app.use("/api/auth", authRouter);
 app.use("/api/download", downloadRouter);
 app.use("/public/visites", visiteRouter);
 
-db.connectDB();
+// db.connectDB();
+
+connectDB();
 
 //start listening here
 const port = process.env.PORT || 3000;
