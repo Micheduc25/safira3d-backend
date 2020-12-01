@@ -80,7 +80,6 @@ const safiraModuleSchema = new mongoose.Schema({
 
   visit_url: {
     type: String,
-    required: true,
   },
 
   is_complete: {
@@ -108,7 +107,7 @@ function validateModule(module) {
     likers: Joi.array(),
     viewers: Joi.array(),
     is_complete: Joi.boolean(),
-    visit_url: Joi.string().required(),
+    visit_url: Joi.string(),
   }).validate(module);
 }
 
@@ -147,8 +146,7 @@ function validateUpdateModule(updateData) {
       "visit_url",
       "is_complete"
     )
-    .validate(updateData
-    );
+    .validate(updateData);
 }
 exports.SafiraModule = SafiraModule;
 exports.validateModule = validateModule;
