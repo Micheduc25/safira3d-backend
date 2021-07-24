@@ -53,11 +53,11 @@ const imagesUpload = upload.fields([
     maxCount: 1,
   },
 ]);
-async function getAllModules() {
+async function getAllModules(userId) {
   return new Promise((resolve, reject) => {
     SafiraModule.find()
       .populate("creator", "-password -__v")
-      .sort({ date: -1 })
+      .sort({ date: -1 }) //TODO: return modules according to user's preferences in future
       .select({ __v: 0 })
       .then((result) => {
         resolve(result);
@@ -281,14 +281,14 @@ async function viewModule(moduleId, viewerId) {
 //function to rate a module
 async function rateModule(moduleId, raterId, value) {
   //we check if the given value is valid
-  let intValue;
+  let floatValue;
   try {
-    intValue = parseInt(value);
+    floatValue = parseFloat(value);
   } catch (err) {
     throw { code: 400, error: "An invalid rating value was given" };
   }
   const { error } = validateRating({
-    value: intValue,
+    value: floatValue,
     raterId: raterId,
     moduleId: moduleId,
   });
@@ -308,6 +308,7 @@ async function rateModule(moduleId, raterId, value) {
       });
     } catch (err) {
       reject({ code: 400, error: err });
+      return;
     }
 
     //we fetch the said module;
@@ -315,18 +316,19 @@ async function rateModule(moduleId, raterId, value) {
       module = await SafiraModule.findById(moduleId);
     } catch (err) {
       reject({ code: 400, error: "Invalid module Id" });
+      return;
     }
 
     if (module) {
       //if the rating document for this user and module already exist we just update it
       //else we create a new rating document from the given values and save it.
       if (existingRating) {
-        existingRating.value = intValue;
+        existingRating.value = floatValue;
         existingRating.date = Date.now();
         await existingRating.save();
       } else {
         const rating = new Rating({
-          value: value,
+          value: floatValue,
           raterId: raterId,
           moduleId: moduleId,
         });

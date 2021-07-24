@@ -26,7 +26,7 @@ const PasswordReset = mongoose.model("PasswordReset", passwordResetSchema);
 function validatePasswordReset(data) {
   return Joi.object({
     email: Joi.string().email().required(),
-    code: Joi.string().length(8).required(),
+    code: Joi.string().length(8),
     newPassword: Joi.string().min(5).required(),
   }).validate(data);
 }

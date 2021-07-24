@@ -18,16 +18,17 @@ const admin = require("../middleware/admin");
 
 const router = express.Router();
 
-router.get("/", async (req, res) => {
+router.get("/",auth, async (req, res) => {
+  const user = req.user;
   try {
-    const result = await getAllModules();
+    const result = await getAllModules(user._id);
     res.send(result);
   } catch (err) {
     res.status(500).send(err);
   }
 });
 
-router.get("/:id", async (req, res) => {
+router.get("/:id",auth, async (req, res) => {
   const { error } = Joi.string().min(1).validate(req.params.id);
 
   if (!error) {

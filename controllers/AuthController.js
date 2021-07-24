@@ -4,6 +4,8 @@ const { User, cleanUser } = require("../models/User");
 const _ = require("lodash");
 const { sendMail } = require("./MailController");
 const randString = require("crypto-random-string");
+
+const {validateEmailVerification, EmailVerification} = require('../models/EmailVerification');
 const {
   validatePasswordReset,
   PasswordReset,
@@ -20,7 +22,6 @@ function validateLogin(loginData) {
 
 async function loginUser(loginData) {
   return new Promise(async (resolve, reject) => {
-    console.log("login data ===>", loginData);
     const { error } = validateLogin(loginData);
 
     if (error) reject({ code: 400, error: error.details[0].message });
@@ -65,6 +66,11 @@ async function loginUser(loginData) {
 
 async function resetPassword(email, newpassword) {
   return new Promise(async (resolve, reject) => {
+    
+    const {error} = validatePasswordReset({email,password});
+
+    if(error) {reject({error:error.details[0].message}); return;}
+
     //  we generate a code that will be used to authenticate the user
     //  and we send an email to the user for him to confirm the reset
     const code = randString({ length: 8 });
@@ -87,6 +93,8 @@ async function resetPassword(email, newpassword) {
           "Si vous n'avez pas fait de requete pour réinitialiser votre mot de passe, ignorer ce mail",
       },
     };
+
+    
 
     try {
       //  we send the mail here
@@ -129,6 +137,7 @@ async function confirmPasswordReset(email, code) {
         code: 400,
         error: "The email or code are not valid",
       });
+      return;
     }
 
     if (passReset) {
@@ -151,12 +160,116 @@ async function confirmPasswordReset(email, code) {
         resolve("Password reset Confirmed!");
       } catch (err) {
         reject({ code: 500, error: err });
+        return;
       }
     } else
       reject({ code: 404, error: "Could not find the password reset request" });
   });
 }
 
+ function sendEmailVerifyCode(email){
+
+  return new Promise(async(resolve,reject)=>{
+    const verif = await EmailVerification.findOne({email});
+
+    if(verif) await verif.deleteOne();
+    try{
+      let user = await User.findOne({
+        email
+      });
+
+      if(!user) {reject({code:404, error:"No user with this email found"}); return;}
+
+      const code = randString({ length: 6 });
+
+      const response = {
+        body: {
+          name: email,
+          intro: `Vous avez recu ce mail pourque vous puissiez confirmer votre addresse email`,
+  
+          action: {
+            instructions:
+              `Le code de confirmation de votre addresse email est le `,
+            
+              button: {
+                color: "#22BC66", 
+                text: `${code}`,
+                link: ``,
+              },
+          },
+          outro:
+            "Si une requete n'a pas été faite pour confirmer votre addresse email, ignorez ce message",
+        },
+      };
+
+      try{
+        const res = await sendMail(email, "Vérifier Addresse Email", response);
+        const emailVerification = new EmailVerification({
+          email:email,
+          code:code
+        })
+        await emailVerification.save();
+        resolve(res);
+      }
+      catch(err){
+        console.log(err);
+        reject({code:500, error:err});
+        return;
+      }
+      
+    }
+    catch(err){
+
+      reject({code:500, error:err})
+
+    }
+  });
+
+}
+
+
+async function confirmEmailVerification(email,code){
+  return new Promise(async (resolve,reject)=>{
+
+    const {error} = validateEmailVerification({email,code})
+
+    if(error){ reject({ code: 400, error: error.details[0].message }); return;}
+
+    
+    const verif = EmailVerification.findOne({
+      email,code
+    })
+
+    if(!verif){reject({code:404, error:"email verification for this email not found"}); return;};
+
+      try {
+        
+        //  when the verification is found, we find the user with the email and set is_verified to true
+        const user = await User.findOneAndUpdate(
+          {
+            email,
+          },
+          {
+            $set: {
+              is_verified: true,
+            },
+          }
+        );
+
+        //  After successfully updating the user we delete the verification request
+        await EmailVerification.deleteOne({email:verif.email, code:verif.code});
+        // verif.deleteOne();
+        resolve(user);
+
+      } catch (err) {
+        reject({ code: 500, error: err });
+      }
+
+  });
+}
+
 exports.loginUser = loginUser;
 exports.resetPassword = resetPassword;
 exports.confirmPasswordReset = confirmPasswordReset;
+exports.sendEmailVerifyCode = sendEmailVerifyCode;
+exports.confirmEmailVerification = confirmEmailVerification

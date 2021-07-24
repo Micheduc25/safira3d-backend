@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 const Joi = require("joi");
 const { User } = require("./User");
+const { Double } = require("mongodb");
 
 const safiraModuleSchema = new mongoose.Schema({
   title: {
@@ -17,10 +18,10 @@ const safiraModuleSchema = new mongoose.Schema({
     required: true,
   },
   rating: {
-    type: Number,
-    min: 0,
-    max: 5,
-    default: 0,
+    type: Double,
+    min: 0.0,
+    max: 5.0,
+    default: 0.0,
   },
 
   raters: {
@@ -81,6 +82,10 @@ const safiraModuleSchema = new mongoose.Schema({
   visit_url: {
     type: String,
   },
+  app_id:{
+    type:String
+  },
+  apk_url:String,
 
   is_complete: {
     type: Boolean,
@@ -108,6 +113,8 @@ function validateModule(module) {
     viewers: Joi.array(),
     is_complete: Joi.boolean(),
     visit_url: Joi.string(),
+    app_id: Joi.string(),
+    apk_url: Joi.string(),
   }).validate(module);
 }
 
@@ -129,6 +136,9 @@ function validateUpdateModule(updateData) {
     viewers: Joi.array(),
     visit_url: Joi.string(),
     is_complete: Joi.boolean(),
+    app_id: Joi.string(),
+    apk_url: Joi.string(),
+
   })
     .or(
       "title",
@@ -144,6 +154,8 @@ function validateUpdateModule(updateData) {
       "likers",
       "viewers",
       "visit_url",
+      "app_id",
+      "apk_url",
       "is_complete"
     )
     .validate(updateData);

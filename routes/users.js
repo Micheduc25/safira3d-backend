@@ -11,6 +11,11 @@ const {
   deleteUser,
 } = require("../controllers/UserController");
 
+const {
+  sendEmailVerifyCode,
+  confirmEmailVerification,
+} = require("../controllers/AuthController");
+
 const auth = require("../middleware/auth");
 const admin = require("../middleware/admin");
 
@@ -43,7 +48,44 @@ router.post("/", async (req, res) => {
     const newUser = await addUser(
       _.pick(req.body, ["name", "email", "password"])
     );
-    res.status(201).send(cleanUser(newUser));
+
+    //after the user is created we send the verification code
+    try {
+      await sendEmailVerifyCode(newUser.email);
+      res.status(201).send(cleanUser(newUser));
+    } catch (err) {
+      await deleteUser(newUser._id);
+      res.status(err.code).send(err.error);
+    }
+  } catch (err) {
+    console.log(err);
+
+    res.status(err.code).send(err.error);
+  }
+});
+
+//route to cofirm user virification code
+router.post("/verify", async (req, res) => {
+  const data = _.pick(req.body, ["email", "code"]);
+  console.log(data)
+
+  try {
+    const user = await confirmEmailVerification(data.email, data.code);
+    res.status(200).send(user);
+  } catch (err) {
+    console.log(data)
+
+    res.status(err.code).send(err.error);
+  }
+});
+
+//route to send user verification email
+router.post("/verification", async (req, res) => {
+  const data = _.pick(req.body, ["email"]);
+
+  try {
+    const message = await sendEmailVerifyCode(data.email);
+    res.status(200).send(message);
   } catch (err) {
     res.status(err.code).send(err.error);
   }

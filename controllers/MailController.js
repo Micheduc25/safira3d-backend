@@ -4,6 +4,7 @@ const config = require("config");
 
 let transporter = nodemailer.createTransport({
   service: config.get("mailProvider"),
+  host:config.get("mailHost"),
   //   secure: true,
   auth: {
     user: config.get("email"),
@@ -26,7 +27,7 @@ let MailGenerator = new Mailgen({
 async function sendMail(receiver, subject, response) {
   const mail = MailGenerator.generate(response);
   let message = {
-    from: config.get("email"),
+    from: `"Safira3d" <${config.get("email")}>`,
     to: receiver,
     subject: subject,
     html: mail,
@@ -35,7 +36,7 @@ async function sendMail(receiver, subject, response) {
   try {
     await transporter.sendMail(message);
 
-    return `mail sent successfully to ${receiver}`;
+    return `${receiver}`;
   } catch (err) {
     throw { code: 500, error: err };
   }

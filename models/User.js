@@ -26,6 +26,11 @@ const userSchema = new mongoose.Schema({
     default: "user",
     enum: ["user", "admin"],
   },
+  is_verified:{
+    type:Boolean,
+    default:false,
+    required:true
+  }
 });
 
 //we add a method to the user to generate his token
@@ -66,7 +71,7 @@ function validateUpdateUser(updateData) {
 }
 
 function cleanUser(userData) {
-  return _.pick(userData, ["_id", "name", "email", "role"]);
+  return _.pick(userData, ["_id", "name", "email", "role","is_verified"]);
 }
 exports.User = User;
 exports.validateUpdateUser = validateUpdateUser;

@@ -10,18 +10,23 @@ const {
 } = require("../controllers/AuthController");
 router.post("/login", async (req, res) => {
   try {
+    console.log(req.body);
     const result = await loginUser(req.body);
     res.send(result);
   } catch (err) {
     console.log("error is =====>", err);
-    res.status(err.code).send(err.error);
+    res.status(err.code).send({error:err.error});
   }
 });
 
 router.get("/me", auth, async (req, res) => {
   try {
     const user = await getUser(req.user._id);
-    res.send({ message: "success", user: user });
+
+    if(user.is_verified)
+      res.send({ message: "success", user: user });
+    else
+      res.status(401).send({error:"User has not been verified"});
   } catch (err) {
     res.status(err.code).send(err.error);
   }

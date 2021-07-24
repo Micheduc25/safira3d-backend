@@ -9,20 +9,35 @@ const downloadRouter = require("./routes/download");
 const db = require("./db/initDB");
 const path = require("path");
 const config = require("config");
+const cors = require('cors');
 require("dotenv").config();
 const app = express();
 
 const { connectDB } = require("./db/initDB");
+const { json } = require("body-parser");
 if (!config.get("jwtSecretKey")) {
   //if our jwt secret key is not set we exit the application
   console.error("FATAL ERROR JWT KEY NOT SET!");
   process.exit(1);
 }
+
+//we set allowed cors urls here
+const corsOptions = {
+  origin: 'http://localhost:3000',
+  optionsSuccessStatus: 200 
+}
 //middleware
-app.use(express.json());
+app.use(express.json({
+  type:['application/json','text/plain']
+}));
 app.use("/public", express.static(path.join(__dirname, "/public")));
 
 app.use(helmet());
+app.use(cors());
+
+app.use(express.urlencoded({
+  extended: true
+}));
 
 if (app.get("env") === "development") {
   app.use(morgan("tiny"));
