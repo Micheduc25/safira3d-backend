@@ -53,6 +53,8 @@ const imagesUpload = upload.fields([
     maxCount: 1,
   },
 ]);
+
+//we will use the userId to know how to recommend modules to users
 async function getAllModules(userId) {
   return new Promise((resolve, reject) => {
     SafiraModule.find()
@@ -348,15 +350,38 @@ async function rateModule(moduleId, raterId, value) {
 
       const averageRating = Math.round(sum / divider);
 
-      try {
-        module.rating = averageRating;
-        if (!module.raters.includes(raterId)) module.raters.push(raterId);
-        await module.save();
+      const session = await SafiraModule.startSession();
 
-        resolve({ _id: module._id, new_rating: averageRating });
-      } catch (err) {
-        reject({ code: 500, error: err });
+     try{ 
+
+     const result =  await session.withTransaction(
+        ()=>{
+          return new Promise(async(resolve,reject)=>{
+            try {
+              module.rating = averageRating;
+              if (!module.raters.includes(raterId)) module.raters.push(raterId);
+              await module.save();
+      
+              resolve({ _id: module._id, new_rating: averageRating });
+            } catch (err) {
+              reject({ code: 500, error: err });
+            }
+          })
+        }
+        
+        )
+
+        resolve(result);
+
       }
+      catch(err){
+        reject({code:err.code,error:err.error});
+      }
+      finally{
+        session.endSession();
+      }
+        
+
     } else {
       reject({ code: 404, error: "The module was not found" });
     }

@@ -12,6 +12,7 @@ const config = require("config");
 const cors = require('cors');
 require("dotenv").config();
 const app = express();
+const multer = require("multer");
 
 const { connectDB } = require("./db/initDB");
 const { json } = require("body-parser");
@@ -38,6 +39,9 @@ app.use(cors());
 app.use(express.urlencoded({
   extended: true
 }));
+
+const upload = multer();
+app.use(upload.any() );
 
 if (app.get("env") === "development") {
   app.use(morgan("tiny"));

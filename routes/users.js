@@ -9,6 +9,7 @@ const {
   getUser,
   updateUser,
   deleteUser,
+  avatarUpload
 } = require("../controllers/UserController");
 
 const {
@@ -20,7 +21,7 @@ const auth = require("../middleware/auth");
 const admin = require("../middleware/admin");
 
 function cleanUser(userData) {
-  return _.pick(userData, ["_id", "name", "email"]);
+  return _.pick(userData, ["_id", "name", "email","avatar","role","is_verified"]);
 }
 
 router.get("/", async (req, res) => {
@@ -91,9 +92,26 @@ router.post("/verification", async (req, res) => {
   }
 });
 
-router.put("/:id", auth, async (req, res) => {
+router.put("/:id", [auth,avatarUpload], async (req, res) => {
+
+  
+
+  const host = "127.0.0.1"|| req.hostname;
+
+      //remove the port later
+  const filePath =
+    req.protocol + "://" + host + ":5000" + "/public/avatars/";
+
+  let updateData = req.body;
+
+  
+  
+    if (req.files && req.files[0]) {
+      console.log("good",Object.keys(req.files[0]));
+      updateData.avatar = filePath+req.files[0].originalname;
+    }
   try {
-    const updatedUser = await updateUser(req.params.id, req.body);
+    const updatedUser = await updateUser(req.params.id, updateData);
     res.send(cleanUser(updatedUser));
   } catch (err) {
     res.status(err.code).send(err.error);

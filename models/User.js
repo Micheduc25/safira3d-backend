@@ -15,6 +15,9 @@ const userSchema = new mongoose.Schema({
     required: true,
     unique: true,
   },
+  avatar:{
+    type:String
+  },
 
   password: {
     type: String,
@@ -56,6 +59,7 @@ function validateUser(userData) {
     email: Joi.string().required().email(),
     password: Joi.string().required(),
     role: Joi.string().min(3),
+    avatar:Joi.string()
   }).validate(userData);
 }
 
@@ -65,13 +69,14 @@ function validateUpdateUser(updateData) {
     email: Joi.string().email(),
     password: Joi.string(),
     role: Joi.string().min(3),
+    avatar:Joi.string()
   })
-    .or("name", "email", "password", "role")
+    .or("name", "email", "password", "role","avatar")
     .validate(updateData);
 }
 
 function cleanUser(userData) {
-  return _.pick(userData, ["_id", "name", "email", "role","is_verified"]);
+  return _.pick(userData, ["_id", "name", "email", "role","is_verified","avatar"]);
 }
 exports.User = User;
 exports.validateUpdateUser = validateUpdateUser;

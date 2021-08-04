@@ -22,13 +22,14 @@ router.post("/login", async (req, res) => {
 router.get("/me", auth, async (req, res) => {
   try {
     const user = await getUser(req.user._id);
-
-    if(user.is_verified)
+    if(!user)return res.status(403).send({error:"invalid user"});
+    if( user.is_verified)
       res.send({ message: "success", user: user });
     else
       res.status(401).send({error:"User has not been verified"});
   } catch (err) {
-    res.status(err.code).send(err.error);
+    console.log(err);
+    res.status(err.code).send({error:err.error});
   }
 });
 

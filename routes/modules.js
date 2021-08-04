@@ -45,7 +45,7 @@ router.get("/:id",auth, async (req, res) => {
   }
 });
 
-router.post("/", [auth, imagesUpload], async (req, res) => {
+router.post("/", [auth,admin, imagesUpload], async (req, res) => {
   if (!req.files || Object.keys(req.files).length === 0) {
     res.status(422).send("No file was selected");
     return;
@@ -98,7 +98,7 @@ router.put("/:id", [auth, imagesUpload], async (req, res) => {
         req.protocol + "://" + host + ":5000" + "/public/module_images/";
       let updateFields = req.body;
 
-      console.log(updateFields, req.files, req.params.id);
+      // console.log(updateFields, req.files, req.params.id);
 
       if (req.files && req.files.foreground_image) {
         updateFields.foreground_image =

@@ -1,10 +1,9 @@
 const mongoose = require("mongoose");
 const Joi = require("joi");
-const { Double } = require("mongodb");
 
 const ratingSchema = new mongoose.Schema({
   value: {
-    type: Double,
+    type: Number,
     default: 0,
     required: true,
   },
