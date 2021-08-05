@@ -63,7 +63,7 @@ app.use("/public/visites", visiteRouter);
 connectDB();
 
 //start listening here
-const port = process.env.PORT || 5000;
+const port = process.env.PORT || 3000;
 app.listen(port, () => {
   console.log("server running at ", port);
 });
