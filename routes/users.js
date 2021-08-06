@@ -68,7 +68,6 @@ router.post("/", async (req, res) => {
 //route to cofirm user virification code
 router.post("/verify", async (req, res) => {
   const data = _.pick(req.body, ["email", "code"]);
-  console.log(data)
 
   try {
     const user = await confirmEmailVerification(data.email, data.code);

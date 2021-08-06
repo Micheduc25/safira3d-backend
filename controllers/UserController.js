@@ -49,7 +49,7 @@ async function addUser(userData) {
     if (error) reject({ code: 400, error: error.details[0].message });
     else {
       const user = await User.findOne({ email: userData.email });
-      if (user) reject({ code: 400, error: "User already exists" });
+      if (user) reject({ code: 400, error: "Un utilisateur avec cette addresse existe déjà" });
       else {
         const salt = await bcrypt.genSalt(10); //    generates a certain random string to make cracking harder
         //  we then hash the password with the hash method of bcrypt
