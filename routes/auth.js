@@ -15,7 +15,7 @@ router.post("/login", async (req, res) => {
     res.send(result);
   } catch (err) {
     console.log("error is =====>", err);
-    res.status(err.code).send({error:err.error});
+    res.status(err.code).send(err.error);
   }
 });
 
@@ -29,7 +29,7 @@ router.get("/me", auth, async (req, res) => {
       res.status(401).send({error:"User has not been verified"});
   } catch (err) {
     console.log(err);
-    res.status(err.code).send({error:err.error});
+    res.status(err.code).send(err.error);
   }
 });
 
