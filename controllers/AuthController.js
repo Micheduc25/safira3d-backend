@@ -240,7 +240,7 @@ async function confirmEmailVerification(email,code){
       email,code
     })
 
-    if(!verif){reject({code:404, error:"email verification for this email not found"}); return;};
+    if(!verif){reject({code:404, error:"Le code est incorrect"}); return;};
 
       try {
         
@@ -252,8 +252,11 @@ async function confirmEmailVerification(email,code){
           {
             $set: {
               is_verified: true,
+              
             },
-          }
+            
+          },
+          {returnNewDocument: true}
         );
 
         //  After successfully updating the user we delete the verification request

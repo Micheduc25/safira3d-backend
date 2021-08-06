@@ -6,7 +6,7 @@ module.exports = function (req, res, next) {
   if (token && token.toLowerCase().includes("bearer "))
     token = token.replace("bearer ", "").replace("Bearer ", "");
 
-  if (!token) return res.status(401).send("Access denied! No token provided");
+  if (!token) return res.status(401).send("Accèss refusé");
 
   try {
     //    we attempt to decode the obtained token

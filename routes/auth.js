@@ -39,7 +39,7 @@ router.post("/logout", (req, res) => {
 
 router.post("/password/reset", async (req, res) => {
   //  body should contain email and new password
-  const data = req.body;
+  const data = _.pick( req.body, ['email','password']);
 
   try {
     await resetPassword(data.email, data.newpassword);
