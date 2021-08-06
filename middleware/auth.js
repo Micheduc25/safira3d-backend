@@ -11,6 +11,7 @@ module.exports = function (req, res, next) {
   try {
     //    we attempt to decode the obtained token
     const decoded = jwt.verify(token, config.get("jwtSecretKey"));
+    if(!decoded.is_verified)return res.status(401).send("L'utilisateur n'a pas été vérifié");
     req.user = decoded;
     next();
   } catch (err) {

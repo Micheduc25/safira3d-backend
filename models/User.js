@@ -44,6 +44,8 @@ userSchema.methods.generateAuthToken = function () {
       email: this.email,
       name: this.name,
       role: this.role,
+      is_verified:this.is_verified,
+      avatar:this.avatar
     },
     config.get("jwtSecretKey") //    we get the env var related to this setting
   );
