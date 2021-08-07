@@ -1,9 +1,8 @@
 {
     "name":"Safira3d Production",
-    "main_url":"http://safira3d.com",
-    "email":"ndjockjunior@gmail.com",
-    "mailProvider":"gmail",
-    "mailHost":"smtp.gmail.com"
+    "main_url":"https://safira3d.net",
+    "email":"mail@safira3d.net",
+    "mailHost":"mail50.lwspanel.com"
 
 
 
