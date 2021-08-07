@@ -14,7 +14,7 @@ const storage = multer.diskStorage({
     cb(null, "public/avatars");
   },
   filename: (req, file, cb) => {
-    console.log("detemining file name======>",file);
+    
     cb(null, "avatar-"+req.user._id + path.extname(file.originalname));
   },
 });
@@ -40,7 +40,6 @@ const upload = multer({
 
 const avatarUpload = upload.single('avatar');
 
-// const updatesUpload = upload.fields([{name:avatar, maxCount:1},])
 
 async function addUser(userData) {
   return new Promise(async (resolve, reject) => {

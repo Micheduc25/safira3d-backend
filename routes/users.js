@@ -2,6 +2,7 @@ const express = require("express");
 
 const router = express.Router();
 const _ = require("lodash");
+const fs = require('fs/promises');
 
 const {
   addUser,
@@ -95,24 +96,29 @@ router.put("/:id", [auth,avatarUpload], async (req, res) => {
 
   
 
-  const host = "127.0.0.1"|| req.hostname;
+  const host = req.hostname;
 
-      //remove the port later
   const filePath =
-    req.protocol + "://" + host + ":5000" + "/public/avatars/";
+    req.protocol + "://" + host + ":" + process.env.PORT + "/public/avatars/";
 
   let updateData = req.body;
 
   
   
-    if (req.files && req.files[0]) {
-      console.log("good",Object.keys(req.files[0]));
-      updateData.avatar = filePath+req.files[0].originalname;
+    if (req.files && req.files.avatar) {
+      
+      updateData.avatar = filePath+req.files.avatar.filename;
     }
   try {
     const updatedUser = await updateUser(req.params.id, updateData);
     res.send(cleanUser(updatedUser));
   } catch (err) {
+    try {
+      await fs.unlink(req.files.avatar.path);
+    } catch (err) {
+      console.log(err);
+      //pass
+    }
     res.status(err.code).send(err.error);
   }
 });
