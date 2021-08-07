@@ -47,7 +47,7 @@ userSchema.methods.generateAuthToken = function () {
       is_verified:this.is_verified,
       avatar:this.avatar
     },
-    config.get("jwtSecretKey") //    we get the env var related to this setting
+    process.env.JWT_SECRET_KEY //    we get the env var related to this setting
   );
 
   return token;

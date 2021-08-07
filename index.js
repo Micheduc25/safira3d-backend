@@ -6,19 +6,17 @@ const usersRouter = require("./routes/users");
 const authRouter = require("./routes/auth");
 const visiteRouter = require("./routes/visites");
 const downloadRouter = require("./routes/download");
-const db = require("./db/initDB");
+// const db = require("./db/initDB");
 const path = require("path");
-const config = require("config");
+// const config = require("config");
 const cors = require('cors');
-require("dotenv").config();
 const app = express();
-const multer = require("multer");
 
 const { connectDB } = require("./db/initDB");
-const { json } = require("body-parser");
-if (!config.get("jwtSecretKey")) {
-  //if our jwt secret key is not set we exit the application
-  console.error("FATAL ERROR JWT KEY NOT SET!");
+
+if (!process.env.JWT_SECRET_KEY|| !process.env.DB_URL|| !process.env.MAIL_PASSWORD||!process.env.PORT) {
+ //if our environment variables are not well set we exit the app
+  console.error("FATAL ERROR ALL ENV VARIABLES ARE NOT SET!");
   process.exit(1);
 }
 
@@ -40,15 +38,12 @@ app.use(express.urlencoded({
   extended: true
 }));
 
-const upload = multer();
-app.use(upload.any() );
-
 if (app.get("env") === "development") {
   app.use(morgan("tiny"));
 }
 
 app.get("/", (req, res) => {
-  res.send("Hello World!");
+  res.send("Safira3d!");
 });
 
 //  routes here
@@ -57,13 +52,10 @@ app.use("/api/users", usersRouter);
 app.use("/api/auth", authRouter);
 app.use("/api/download", downloadRouter);
 app.use("/public/visites", visiteRouter);
-
-// db.connectDB();
-
 connectDB();
 
 //start listening here
-const port = process.env.PORT || 3000;
+const port = process.env.PORT;
 app.listen(port, () => {
   console.log("server running at ", port);
 });

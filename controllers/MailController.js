@@ -8,7 +8,7 @@ let transporter = nodemailer.createTransport({
   //   secure: true,
   auth: {
     user: config.get("email"),
-    pass: config.get("mailPassword"),
+    pass: process.env.MAIL_PASSWORD,
   },
   tls: {
     // do not fail on invalid certs

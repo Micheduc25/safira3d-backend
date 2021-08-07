@@ -5,7 +5,6 @@ const {
 } = require("../models/SafiraModule");
 
 const path = require("path");
-
 const multer = require("multer");
 const Joi = require("joi");
 const { Rating, validateRating } = require("../models/Rating");
@@ -16,8 +15,13 @@ const storage = multer.diskStorage({
     cb(null, "public/module_images");
   },
   filename: (req, file, cb) => {
-    console.log(file);
-    cb(null, Date.now() + path.extname(file.originalname));
+    let filename;
+    const title = req.body.title;
+    if (file.fieldname === "foreground_image")
+      filename = title + "_foreground_image";
+    else filename = title + "_background_image";
+
+    cb(null, filename + path.extname(file.originalname));
   },
 });
 
@@ -88,7 +92,7 @@ async function addModule(moduleData) {
     if (mod) {
       throw {
         code: 400,
-        error: `Module "${moduleData.title}" already exists!`,
+        error: `Le Module "${moduleData.title}" existe déjà`,
       };
     } else {
       try {
@@ -249,33 +253,46 @@ async function viewModule(moduleId, viewerId) {
     try {
       module = await SafiraModule.findById(moduleId);
     } catch (err) {
-      reject({ code: 400, error: "The Provided Id is Invalid" });
+      return reject({ code: 400, error: "The Provided Id is Invalid" });
     }
 
-    if (module) {
-      if (module.viewers.includes(viewerId)) {
-        reject({ code: 400, error: "User has already viewed this module" });
-      } else {
-        try {
-          await SafiraModule.updateOne(
-            { _id: module._id },
-            {
-              $inc: {
-                views: 1,
-              },
-              $push: {
-                viewers: viewerId,
-              },
-            }
-          );
+    if (!module)
+      return reject({ code: 404, error: "The Module was not found" });
 
-          resolve({ code: 200, message: "successfully viewed module!" });
-        } catch (err) {
-          reject({ code: 500, error: err });
-        }
-      }
+    if (module.viewers.includes(viewerId)) {
+      reject({ code: 400, error: "User has already viewed this module" });
     } else {
-      reject({ code: 404, error: "The Module was not found" });
+      const session = await SafiraModule.startSession();
+
+      try {
+        const result = await session.withTransaction(() => {
+          return new Promise(async (resolve, reject) => {
+            try {
+              await SafiraModule.updateOne(
+                { _id: module._id },
+                {
+                  $inc: {
+                    views: 1,
+                  },
+                  $push: {
+                    viewers: viewerId,
+                  },
+                }
+              );
+
+              resolve({ code: 200, message: "successfully viewed module!" });
+            } catch (err) {
+              reject({ code: 500, error: err });
+            }
+          });
+        });
+
+        resolve(result);
+      } catch (err) {
+        reject({ code: err.code, error: err.error });
+      } finally {
+        session.endSession();
+      }
     }
   });
 }
@@ -350,38 +367,30 @@ async function rateModule(moduleId, raterId, value) {
 
       const averageRating = Math.round(sum / divider);
 
+      //we perform a transaction to update the module
       const session = await SafiraModule.startSession();
-
-     try{ 
-
-     const result =  await session.withTransaction(
-        ()=>{
-          return new Promise(async(resolve,reject)=>{
+      let results;
+      try {
+         await session.withTransaction(() => {
+          return new Promise(async (resolve, reject) => {
             try {
               module.rating = averageRating;
               if (!module.raters.includes(raterId)) module.raters.push(raterId);
               await module.save();
-      
+              result = { _id: module._id, new_rating: averageRating };
               resolve({ _id: module._id, new_rating: averageRating });
             } catch (err) {
               reject({ code: 500, error: err });
             }
-          })
-        }
-        
-        )
-
+          });
+        });
+        console.log("result===>",result);
         resolve(result);
-
-      }
-      catch(err){
-        reject({code:err.code,error:err.error});
-      }
-      finally{
+      } catch (err) {
+        reject({ code: err.code, error: err.error });
+      } finally {
         session.endSession();
       }
-        
-
     } else {
       reject({ code: 404, error: "The module was not found" });
     }

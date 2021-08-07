@@ -82,10 +82,11 @@ const safiraModuleSchema = new mongoose.Schema({
   visit_url: {
     type: String,
   },
-  app_id:{
-    type:String
+  app_id: {
+    type: String,
+    default: "",
   },
-  apk_url:String,
+  apk_url: { type: String, default: "" },
 
   is_complete: {
     type: Boolean,
@@ -112,9 +113,9 @@ function validateModule(module) {
     likers: Joi.array(),
     viewers: Joi.array(),
     is_complete: Joi.boolean(),
-    visit_url: Joi.string(),
-    app_id: Joi.string(),
-    apk_url: Joi.string(),
+    visit_url: Joi.string().allow(null,""),
+    app_id: Joi.string().allow(null, ""),
+    apk_url: Joi.string().allow(null, ""),
   }).validate(module);
 }
 
@@ -134,11 +135,10 @@ function validateUpdateModule(updateData) {
     views: Joi.number().min(0),
     likers: Joi.array(),
     viewers: Joi.array(),
-    visit_url: Joi.string(),
+    visit_url: Joi.string().allow(null,""),
     is_complete: Joi.boolean(),
-    app_id: Joi.string(),
-    apk_url: Joi.string(),
-
+    app_id: Joi.string().allow(null, ""),
+    apk_url: Joi.string().allow(null, ""),
   })
     .or(
       "title",

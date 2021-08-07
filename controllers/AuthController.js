@@ -256,7 +256,7 @@ async function confirmEmailVerification(email,code){
             },
             
           },
-          {returnNewDocument: true}
+          {new: true}
         );
 
         //  After successfully updating the user we delete the verification request

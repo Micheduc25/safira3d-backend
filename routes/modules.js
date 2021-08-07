@@ -1,4 +1,6 @@
 const express = require("express");
+const fs = require("fs/promises");
+const path = require("path");
 const {
   getAllModules,
   getModule,
@@ -18,7 +20,7 @@ const admin = require("../middleware/admin");
 
 const router = express.Router();
 
-router.get("/",auth, async (req, res) => {
+router.get("/", auth, async (req, res) => {
   const user = req.user;
   try {
     const result = await getAllModules(user._id);
@@ -28,7 +30,7 @@ router.get("/",auth, async (req, res) => {
   }
 });
 
-router.get("/:id",auth, async (req, res) => {
+router.get("/:id", auth, async (req, res) => {
   const { error } = Joi.string().min(1).validate(req.params.id);
 
   if (!error) {
@@ -41,22 +43,23 @@ router.get("/:id",auth, async (req, res) => {
       res.status(500).send(err);
     }
   } else {
-    res.status(422).send("The given id is invalid");
+    res.status(400).send("The given id is invalid");
   }
 });
 
-router.post("/", [auth,admin, imagesUpload], async (req, res) => {
+router.post("/", [auth, admin, imagesUpload], async (req, res) => {
   if (!req.files || Object.keys(req.files).length === 0) {
-    res.status(422).send("No file was selected");
+    res.status(400).send("No file was selected");
     return;
   } else {
     if (!req.files.foreground_image) {
-      res.status(422).send("No Foreground image file was selected");
+      res.status(400).send("No Foreground image file was selected");
+
       return;
     }
 
     if (!req.files.background_image) {
-      res.status(422).send("No Background image file was selected");
+      res.status(400).send("No Background image file was selected");
       return;
     }
   }
@@ -64,7 +67,12 @@ router.post("/", [auth,admin, imagesUpload], async (req, res) => {
 
   //remove the port later
   const filePath =
-    req.protocol + "://" + host + ":5000" + "/public/module_images/";
+    req.protocol +
+    "://" +
+    host +
+    ":" +
+    process.env.PORT +
+    "/public/module_images/";
 
   let moduleFields = req.body;
   moduleFields.foreground_image =
@@ -75,6 +83,7 @@ router.post("/", [auth,admin, imagesUpload], async (req, res) => {
   try {
     //we add the creator of the course and create the module
     moduleFields.creator = req.user._id;
+    moduleFields.categories = JSON.parse(moduleFields.categories);
     const result = await addModule(moduleFields);
 
     res.status(201).send({
@@ -82,11 +91,24 @@ router.post("/", [auth,admin, imagesUpload], async (req, res) => {
       data: result,
     });
   } catch (err) {
+    //if an error occurs we delete the files which were saved
+    try {
+      await fs.unlink(req.files.foreground_image[0].path);
+    } catch (err) {
+      console.log(err);
+      //pass
+    }
+    try {
+      await fs.unlink(req.files.background_image[0].path);
+    } catch (err) {
+      console.log(err);
+      //pass
+    }
     res.status(err.code).send({ error: err.error });
   }
 });
 
-router.put("/:id", [auth, imagesUpload], async (req, res) => {
+router.put("/:id", [auth, admin, imagesUpload], async (req, res) => {
   const { error } = Joi.string().min(1).validate(req.params.id);
 
   if (!error) {
@@ -95,10 +117,13 @@ router.put("/:id", [auth, imagesUpload], async (req, res) => {
 
       //remove the port later
       const filePath =
-        req.protocol + "://" + host + ":5000" + "/public/module_images/";
+        req.protocol +
+        "://" +
+        host +
+        ":" +
+        process.env.PORT +
+        "/public/module_images/";
       let updateFields = req.body;
-
-      // console.log(updateFields, req.files, req.params.id);
 
       if (req.files && req.files.foreground_image) {
         updateFields.foreground_image =
@@ -108,6 +133,10 @@ router.put("/:id", [auth, imagesUpload], async (req, res) => {
         updateFields.background_image =
           filePath + req.files.background_image[0].filename;
       }
+
+      if (updateFields.categories)
+        updateFields.categories = JSON.parse(updateFields.categories);
+
       const result = await updateModule(req.params.id, updateFields, req.user);
       res.send({
         message: "successfully updated module",
@@ -116,7 +145,7 @@ router.put("/:id", [auth, imagesUpload], async (req, res) => {
     } catch (err) {
       res.status(err.code).send(err.error);
     }
-  } else res.status(422).send("The id sent was invalid");
+  } else res.status(400).send("The id sent was invalid");
 });
 
 router.put("/like/:id", auth, async (req, res) => {

@@ -1,5 +1,5 @@
 const jwt = require("jsonwebtoken");
-const config = require("config");
+// const config = require("config");
 module.exports = function (req, res, next) {
   let token = req.header("x-auth-token");
 
@@ -10,7 +10,7 @@ module.exports = function (req, res, next) {
 
   try {
     //    we attempt to decode the obtained token
-    const decoded = jwt.verify(token, config.get("jwtSecretKey"));
+    const decoded = jwt.verify(token, process.env.JWT_SECRET_KEY);
     if(!decoded.is_verified)return res.status(401).send("L'utilisateur n'a pas été vérifié");
     req.user = decoded;
     next();
