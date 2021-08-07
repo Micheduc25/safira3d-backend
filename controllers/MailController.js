@@ -3,7 +3,7 @@ const Mailgen = require("mailgen");
 const config = require("config");
 
 let transporter = nodemailer.createTransport({
-  service: config.get("mailProvider"),
+  // service: config.get("mailProvider"),
   host:config.get("mailHost"),
   //   secure: true,
   auth: {

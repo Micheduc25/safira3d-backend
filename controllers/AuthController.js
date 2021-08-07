@@ -86,11 +86,11 @@ async function resetPassword(email, newpassword) {
           button: {
             color: "#22BC66", // Optional action button color
             text: "Reinitialiser Mot de Passe",
-            link: `http://locahost:5000/api/auth/password/confirm-reset?code=${code}&email=${email}`,
+            link: `http://locahost:${process.env.PORT}/api/auth/password/confirm-reset?code=${code}&email=${email}`,
           },
         },
         outro:
-          "Si vous n'avez pas fait de requete pour réinitialiser votre mot de passe, ignorer ce mail",
+          "Si vous n'avez pas fait de requete pour réinitialiser votre mot de passe, ignorez ce mail",
       },
     };
 
