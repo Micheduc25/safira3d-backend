@@ -22,7 +22,7 @@ if (!process.env.JWT_SECRET_KEY|| !process.env.DB_URL|| !process.env.MAIL_PASSWO
 
 //we set allowed cors urls here
 const corsOptions = {
-  origin: 'http://localhost:3000',
+  origin: 'http://localhost:8080',
   optionsSuccessStatus: 200 
 }
 //middleware

@@ -17,20 +17,22 @@ const {
 const Joi = require("joi");
 const auth = require("../middleware/auth");
 const admin = require("../middleware/admin");
+const authOrReadonly = require("../middleware/authOrReadonly");
 
 const router = express.Router();
 
-router.get("/", auth, async (req, res) => {
+router.get("/",authOrReadonly, async (req, res) => {
+  console.log("origin===>",req.header('Origin'));
   const user = req.user;
   try {
-    const result = await getAllModules(user._id);
+    const result = await getAllModules(user?user._id:null);
     res.send(result);
   } catch (err) {
     res.status(500).send(err);
   }
 });
 
-router.get("/:id", auth, async (req, res) => {
+router.get("/:id", authOrReadonly, async (req, res) => {
   const { error } = Joi.string().min(1).validate(req.params.id);
 
   if (!error) {
