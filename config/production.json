@@ -2,7 +2,8 @@
     "name":"Safira3d Production",
     "main_url":"https://safira3d.net",
     "email":"mail@safira3d.net",
-    "mailHost":"mail50.lwspanel.com"
+    "mailHost":"mail50.lwspanel.com",
+    "allowedHosts":["https://safira3d.net","https://www.safira3d.net" ]
 
 
 

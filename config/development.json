@@ -2,5 +2,6 @@
     "name":"Safira3d Development",
     "main_url":"http://localhost:3000",
     "email":"mail@safira3d.net",
-    "mailHost":"mail50.lwspanel.com"
+    "mailHost":"mail50.lwspanel.com",
+    "allowedHosts":["http://localhost:3000"]
 }

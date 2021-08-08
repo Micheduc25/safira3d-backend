@@ -11,8 +11,10 @@ const path = require("path");
 // const config = require("config");
 const cors = require('cors');
 const app = express();
+const config = require('config');
 
 const { connectDB } = require("./db/initDB");
+// const { config } = require("dotenv");
 
 if (!process.env.JWT_SECRET_KEY|| !process.env.DB_URL|| !process.env.MAIL_PASSWORD||!process.env.PORT) {
  //if our environment variables are not well set we exit the app
@@ -22,7 +24,7 @@ if (!process.env.JWT_SECRET_KEY|| !process.env.DB_URL|| !process.env.MAIL_PASSWO
 
 //we set allowed cors urls here
 const corsOptions = {
-  origin: 'http://localhost:8080',
+  origin: config.get("allowedHosts"),
   optionsSuccessStatus: 200 
 }
 //middleware
@@ -32,7 +34,8 @@ app.use(express.json({
 app.use("/public", express.static(path.join(__dirname, "/public")));
 
 app.use(helmet());
-app.use(cors());
+
+app.use(cors(corsOptions));
 
 app.use(express.urlencoded({
   extended: true

@@ -289,7 +289,7 @@ async function viewModule(moduleId, viewerId) {
 
         resolve(result);
       } catch (err) {
-        reject({ code: err.code, error: err.error });
+        reject({ code: 500, error: err.error });
       } finally {
         session.endSession();
       }
