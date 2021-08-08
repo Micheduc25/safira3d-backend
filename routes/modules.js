@@ -22,7 +22,7 @@ const authOrReadonly = require("../middleware/authOrReadonly");
 const router = express.Router();
 
 router.get("/",authOrReadonly, async (req, res) => {
-  console.log("origin===>",req.header('Origin'));
+  // console.log("origin===>",req.header('Origin'));
   const user = req.user;
   try {
     const result = await getAllModules(user?user._id:null);
