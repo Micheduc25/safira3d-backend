@@ -21,7 +21,7 @@ if (!process.env.JWT_SECRET_KEY|| !process.env.DB_URL|| !process.env.MAIL_PASSWO
   console.error("FATAL ERROR ALL ENV VARIABLES ARE NOT SET!");
   process.exit(1);
 }
-console.log(config.get("allowedHosts"));
+// console.log(config.get("allowedHosts"));
 //we set allowed cors urls here
 const corsOptions = {
   origin: config.get("allowedHosts"),

@@ -10,5 +10,5 @@ module.exports = async function (req, res, next) {
       console.error(err);
       res.status(500).send("Une erreur inconnue s'est produite");
     }
-  }
+  }else res.status(401).send("Access denied");
 };
