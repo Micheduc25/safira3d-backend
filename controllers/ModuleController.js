@@ -265,7 +265,9 @@ async function viewModule(moduleId, viewerId) {
       const session = await SafiraModule.startSession();
 
       try {
-        const result = await session.withTransaction(() => {
+        
+         await session.withTransaction(
+           () => {
           return new Promise(async (resolve, reject) => {
             try {
               await SafiraModule.updateOne(
@@ -287,9 +289,9 @@ async function viewModule(moduleId, viewerId) {
           });
         });
 
-        resolve(result);
+        resolve("successfully viewed module");
       } catch (err) {
-        reject({ code: 500, error: err.error });
+        reject({ code: 500, error: err.toString() });
       } finally {
         session.endSession();
       }
