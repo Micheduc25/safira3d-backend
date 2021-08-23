@@ -104,8 +104,7 @@ router.put("/:id", [auth, avatarUpload], async (req, res) => {
   const host = req.hostname;
 
   const filePath =
-    req.protocol +
-    "://" +
+  "https://"+
     host +
     (process.env.NODE_ENV === "development" ? ":" + process.env.PORT : "") +
     "/public/avatars/";

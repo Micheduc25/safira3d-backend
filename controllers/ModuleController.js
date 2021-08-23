@@ -260,7 +260,7 @@ async function viewModule(moduleId, viewerId) {
       return reject({ code: 404, error: "The Module was not found" });
 
     if (module.viewers.includes(viewerId)) {
-      reject({ code: 400, error: "User has already viewed this module" });
+      return reject({ code: 400, error: "User has already viewed this module" });
     } else {
       const session = await SafiraModule.startSession();
 

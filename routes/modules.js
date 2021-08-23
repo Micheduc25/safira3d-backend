@@ -71,8 +71,7 @@ router.post("/", [auth, admin, imagesUpload], async (req, res) => {
 
   //remove the port later
   let filePath =
-    req.protocol +
-    "://" +
+    "https://" +
     host +
     (process.env.NODE_ENV === "development" ? ":" + process.env.PORT : "") +
     "/public/module_images/";
@@ -120,8 +119,7 @@ router.put("/:id", [auth, admin, imagesUpload], async (req, res) => {
 
       //remove the port later
       let filePath =
-        req.protocol +
-        "://" +
+      "https://"+
         host +
         (process.env.NODE_ENV === "development" ? ":" + process.env.PORT : "") +
         "/public/module_images/";
