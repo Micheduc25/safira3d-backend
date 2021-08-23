@@ -12,6 +12,7 @@ const {
   updateUser,
   deleteUser,
   avatarUpload,
+  checkAdmin
 } = require("../controllers/UserController");
 
 const {
@@ -21,6 +22,7 @@ const {
 
 const auth = require("../middleware/auth");
 const admin = require("../middleware/admin");
+const { reject } = require("lodash");
 
 function cleanUser(userData) {
   return _.pick(userData, [
@@ -99,6 +101,27 @@ router.post("/verification", async (req, res) => {
     res.status(err.code).send(err.error);
   }
 });
+
+//check if user is an admin
+
+router.post("/check-admin",auth,async (req,res)=>{
+
+  const userId = _.pick(req.body,["id"]).id;
+
+  try{
+
+    if(userId)
+      await checkAdmin(userId)
+    else res.status(400).send("invalid user Id");
+
+  }
+
+  catch(err){
+    res.status(err.status).send(err.error);
+  }
+
+});
+
 
 router.put("/:id", [auth, avatarUpload], async (req, res) => {
   const host = req.hostname;

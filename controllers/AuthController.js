@@ -5,7 +5,10 @@ const _ = require("lodash");
 const { sendMail } = require("./MailController");
 const randString = require("crypto-random-string");
 
-const {validateEmailVerification, EmailVerification} = require('../models/EmailVerification');
+const {
+  validateEmailVerification,
+  EmailVerification,
+} = require("../models/EmailVerification");
 const {
   validatePasswordReset,
   PasswordReset,
@@ -66,10 +69,12 @@ async function loginUser(loginData) {
 
 async function resetPassword(email, newpassword) {
   return new Promise(async (resolve, reject) => {
-    
-    const {error} = validatePasswordReset({email,password});
+    const { error } = validatePasswordReset({ email, password });
 
-    if(error) {reject({error:error.details[0].message}); return;}
+    if (error) {
+      reject({ error: error.details[0].message });
+      return;
+    }
 
     //  we generate a code that will be used to authenticate the user
     //  and we send an email to the user for him to confirm the reset
@@ -93,8 +98,6 @@ async function resetPassword(email, newpassword) {
           "Si vous n'avez pas fait de requete pour réinitialiser votre mot de passe, ignorez ce mail",
       },
     };
-
-    
 
     try {
       //  we send the mail here
@@ -167,18 +170,20 @@ async function confirmPasswordReset(email, code) {
   });
 }
 
- function sendEmailVerifyCode(email){
+function sendEmailVerifyCode(email) {
+  return new Promise(async (resolve, reject) => {
+    const verif = await EmailVerification.findOne({ email });
 
-  return new Promise(async(resolve,reject)=>{
-    const verif = await EmailVerification.findOne({email});
-
-    if(verif) await verif.deleteOne();
-    try{
+    if (verif) await verif.deleteOne();
+    try {
       let user = await User.findOne({
-        email
+        email,
       });
 
-      if(!user) {reject({code:404, error:"No user with this email found"}); return;}
+      if (!user) {
+        reject({ code: 404, error: "No user with this email found" });
+        return;
+      }
 
       const code = randString({ length: 6 });
 
@@ -186,88 +191,83 @@ async function confirmPasswordReset(email, code) {
         body: {
           name: email,
           intro: `Vous avez recu ce mail pourque vous puissiez confirmer votre addresse email`,
-  
+
           action: {
-            instructions:
-              `Le code de confirmation de votre addresse email est le `,
-            
-              button: {
-                color: "#22BC66", 
-                text: `${code}`,
-                link: ``,
-              },
+            instructions: `Le code de confirmation de votre addresse email est le `,
+
+            button: {
+              color: "#22BC66",
+              text: `${code}`,
+              link: ``,
+            },
           },
           outro:
             "Si une requete n'a pas été faite pour confirmer votre addresse email, ignorez ce message",
         },
       };
 
-      try{
+      try {
         const res = await sendMail(email, "Vérifier Addresse Email", response);
         const emailVerification = new EmailVerification({
-          email:email,
-          code:code
-        })
+          email: email,
+          code: code,
+        });
         await emailVerification.save();
         resolve(res);
-      }
-      catch(err){
+      } catch (err) {
         console.log(err);
-        reject({code:500, error:err});
+        reject({ code: 500, error: err });
         return;
       }
-      
-    }
-    catch(err){
-
-      reject({code:500, error:err})
-
+    } catch (err) {
+      reject({ code: 500, error: err });
     }
   });
-
 }
 
+async function confirmEmailVerification(email, code) {
+  return new Promise(async (resolve, reject) => {
+    const { error } = validateEmailVerification({ email, code });
 
-async function confirmEmailVerification(email,code){
-  return new Promise(async (resolve,reject)=>{
+    if (error) {
+      reject({ code: 400, error: error.details[0].message });
+      return;
+    }
 
-    const {error} = validateEmailVerification({email,code})
-
-    if(error){ reject({ code: 400, error: error.details[0].message }); return;}
-
-    
     const verif = EmailVerification.findOne({
-      email,code
-    })
+      email,
+      code,
+    });
 
-    if(!verif){reject({code:404, error:"Le code est incorrect"}); return;};
+    if (!verif) {
+      reject({ code: 404, error: "Le code est incorrect" });
+      return;
+    }
 
-      try {
-        
-        //  when the verification is found, we find the user with the email and set is_verified to true
-        const user = await User.findOneAndUpdate(
-          {
-            email,
+    try {
+      //  when the verification is found, we find the user with the email and set is_verified to true
+      const user = await User.findOneAndUpdate(
+        {
+          email,
+        },
+        {
+          $set: {
+            is_verified: true,
           },
-          {
-            $set: {
-              is_verified: true,
-              
-            },
-            
-          },
-          {new: true}
-        );
+        },
+        { new: true }
+      );
 
-        //  After successfully updating the user we delete the verification request
-        await EmailVerification.deleteOne({email:verif.email, code:verif.code});
-        // verif.deleteOne();
-        resolve(user);
-
-      } catch (err) {
-        reject({ code: 500, error: err });
-      }
-
+      //  After successfully updating the user we delete the verification request
+      await EmailVerification.deleteOne({
+        email: verif.email,
+        code: verif.code,
+      });
+      // verif.deleteOne();
+      resolve(user);
+    } catch (err) {
+      reject({ code: 500, error: err });
+    }
   });
 }
 
@@ -275,4 +275,5 @@ exports.loginUser = loginUser;
 exports.resetPassword = resetPassword;
 exports.confirmPasswordReset = confirmPasswordReset;
 exports.sendEmailVerifyCode = sendEmailVerifyCode;
-exports.confirmEmailVerification = confirmEmailVerification
+exports.confirmEmailVerification = confirmEmailVerification;
+
