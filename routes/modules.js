@@ -19,7 +19,7 @@ const Joi = require("joi");
 const auth = require("../middleware/auth");
 const admin = require("../middleware/admin");
 const authOrReadonly = require("../middleware/authOrReadonly");
-const { config } = require("dotenv");
+// const { config } = require("dotenv");
 
 const router = express.Router();
 

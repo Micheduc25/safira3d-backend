@@ -8,13 +8,11 @@ const visiteRouter = require("./routes/visites");
 const downloadRouter = require("./routes/download");
 // const db = require("./db/initDB");
 const path = require("path");
-// const config = require("config");
 const cors = require('cors');
 const app = express();
 const config = require('config');
 
 const { connectDB } = require("./db/initDB");
-// const { config } = require("dotenv");
 
 if (!process.env.JWT_SECRET_KEY|| !process.env.DB_URL|| !process.env.MAIL_PASSWORD||!process.env.PORT) {
  //if our environment variables are not well set we exit the app
