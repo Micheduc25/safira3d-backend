@@ -138,6 +138,7 @@ async function deleteUser(id) {
   });
 }
 
+//function to check if a user is an admin
 async function checkAdmin(id) {
   return new Promise((resolve, reject) => {
     const user = User.findOne({ _id: id, role: "admin" })
