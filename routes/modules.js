@@ -74,7 +74,7 @@ router.post("/", [auth, admin, imagesUpload], async (req, res) => {
     req.protocol +
     "://" +
     host +
-    (config.get("env") === "development" ? ":" + process.env.PORT : "") +
+    (process.env.NODE_ENV === "development" ? ":" + process.env.PORT : "") +
     "/public/module_images/";
 
   let moduleFields = req.body;
@@ -123,7 +123,7 @@ router.put("/:id", [auth, admin, imagesUpload], async (req, res) => {
         req.protocol +
         "://" +
         host +
-        (config.get("env") === "development" ? ":" + process.env.PORT : "") +
+        (process.env.NODE_ENV === "development" ? ":" + process.env.PORT : "") +
         "/public/module_images/";
 
       let updateFields = req.body;

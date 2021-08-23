@@ -107,7 +107,7 @@ router.put("/:id", [auth, avatarUpload], async (req, res) => {
     req.protocol +
     "://" +
     host +
-    (config.get("env") === "development" ? ":" + process.env.PORT : "") +
+    (process.env.NODE_ENV === "development" ? ":" + process.env.PORT : "") +
     "/public/avatars/";
 
   let updateData = req.body;
