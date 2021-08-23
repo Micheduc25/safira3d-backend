@@ -2,7 +2,8 @@ const express = require("express");
 
 const router = express.Router();
 const _ = require("lodash");
-const fs = require('fs/promises');
+const fs = require("fs/promises");
+const config = require("config");
 
 const {
   addUser,
@@ -10,7 +11,7 @@ const {
   getUser,
   updateUser,
   deleteUser,
-  avatarUpload
+  avatarUpload,
 } = require("../controllers/UserController");
 
 const {
@@ -22,7 +23,14 @@ const auth = require("../middleware/auth");
 const admin = require("../middleware/admin");
 
 function cleanUser(userData) {
-  return _.pick(userData, ["_id", "name", "email","avatar","role","is_verified"]);
+  return _.pick(userData, [
+    "_id",
+    "name",
+    "email",
+    "avatar",
+    "role",
+    "is_verified",
+  ]);
 }
 
 router.get("/", async (req, res) => {
@@ -74,7 +82,7 @@ router.post("/verify", async (req, res) => {
     const user = await confirmEmailVerification(data.email, data.code);
     res.status(200).send(user);
   } catch (err) {
-    console.log(data)
+    console.log(data);
 
     res.status(err.code).send(err.error);
   }
@@ -92,23 +100,21 @@ router.post("/verification", async (req, res) => {
   }
 });
 
-router.put("/:id", [auth,avatarUpload], async (req, res) => {
-
-  
-
+router.put("/:id", [auth, avatarUpload], async (req, res) => {
   const host = req.hostname;
 
   const filePath =
-    req.protocol + "://" + host + ":" + process.env.PORT + "/public/avatars/";
+    req.protocol +
+    "://" +
+    host +
+    (config.get("env") === "development" ? ":" + process.env.PORT : "") +
+    "/public/avatars/";
 
   let updateData = req.body;
 
-  
-  
-    if (req.files && req.files.avatar) {
-      
-      updateData.avatar = filePath+req.files.avatar.filename;
-    }
+  if (req.files && req.files.avatar) {
+    updateData.avatar = filePath + req.files.avatar.filename;
+  }
   try {
     const updatedUser = await updateUser(req.params.id, updateData);
     res.send(cleanUser(updatedUser));

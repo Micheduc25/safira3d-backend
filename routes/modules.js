@@ -1,6 +1,7 @@
 const express = require("express");
 const fs = require("fs/promises");
 const path = require("path");
+const config = require("config");
 const {
   getAllModules,
   getModule,
@@ -18,14 +19,15 @@ const Joi = require("joi");
 const auth = require("../middleware/auth");
 const admin = require("../middleware/admin");
 const authOrReadonly = require("../middleware/authOrReadonly");
+const { config } = require("dotenv");
 
 const router = express.Router();
 
-router.get("/",authOrReadonly, async (req, res) => {
+router.get("/", authOrReadonly, async (req, res) => {
   // console.log("origin===>",req.header('Origin'));
   const user = req.user;
   try {
-    const result = await getAllModules(user?user._id:null);
+    const result = await getAllModules(user ? user._id : null);
     res.send(result);
   } catch (err) {
     res.status(500).send(err);
@@ -68,12 +70,11 @@ router.post("/", [auth, admin, imagesUpload], async (req, res) => {
   const host = req.hostname;
 
   //remove the port later
-  const filePath =
+  let filePath =
     req.protocol +
     "://" +
     host +
-    ":" +
-    process.env.PORT +
+    (config.get("env") === "development" ? ":" + process.env.PORT : "") +
     "/public/module_images/";
 
   let moduleFields = req.body;
@@ -118,13 +119,13 @@ router.put("/:id", [auth, admin, imagesUpload], async (req, res) => {
       const host = req.hostname;
 
       //remove the port later
-      const filePath =
+      let filePath =
         req.protocol +
         "://" +
         host +
-        ":" +
-        process.env.PORT +
+        (config.get("env") === "development" ? ":" + process.env.PORT : "") +
         "/public/module_images/";
+
       let updateFields = req.body;
 
       if (req.files && req.files.foreground_image) {

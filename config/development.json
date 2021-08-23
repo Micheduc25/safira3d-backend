@@ -4,4 +4,5 @@
     "email":"mail@safira3d.net",
     "mailHost":"mail50.lwspanel.com",
     "allowedHosts":["http://localhost:3000"]
+    
 }
