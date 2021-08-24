@@ -1,6 +1,6 @@
 const Joi = require("joi");
 const bcrypt = require("bcrypt");
-const { User, cleanUser } = require("../models/User");
+const { User, cleanUser, validateUser } = require("../models/User");
 const _ = require("lodash");
 const { sendMail } = require("./MailController");
 const randString = require("crypto-random-string");
@@ -63,6 +63,66 @@ async function loginUser(loginData) {
           });
         }
       }
+    }
+  });
+}
+
+async function socialSignup(userData) {
+  return new Promise(async (resolve, reject) => {
+    const user = await User.findOne({ email: userData.email });
+    if (user) return reject({ code: 400, error: "l'utilisateur existe déjà" });
+
+    const requiredData = _.pick(userData, [
+      "id",
+      "email",
+      "firstName",
+      "lastName",
+    ]);
+    const username =
+      requiredData.firstName + requiredData.lastName
+        ? " " + requiredData.lastName
+        : "";
+
+    try {
+      const newUser = new User({
+        social_id: `${requiredData.id}`,
+        email: requiredData.email,
+        name: username,
+        avatar: "",
+        is_verified: true,
+        role: "user",
+      });
+
+      newUser
+        .save()
+        .then((res) => {
+          resolve(res);
+        })
+        .catch((err) => {
+          reject({ code: 500, error: err });
+        });
+    } catch (err) {
+      reject({ code: 500, error: err });
+    }
+  });
+}
+async function socialLogin(userData) {
+  return new Promise(async (resolve, reject) => {
+    const social_id = _.pick(userData, ["id"]).id;
+
+    if (!social_id) return reject({ code: 400, error: "invalid user id" });
+
+    try {
+      const user = await User.findOne({ social_id });
+      const token = user.generateAuthToken();
+
+      resolve({
+        message: "success",
+        user: cleanUser(user),
+        token: token,
+      });
+    } catch (err) {
+      reject({code:500, error:err});
     }
   });
 }
@@ -276,4 +336,3 @@ exports.resetPassword = resetPassword;
 exports.confirmPasswordReset = confirmPasswordReset;
 exports.sendEmailVerifyCode = sendEmailVerifyCode;
 exports.confirmEmailVerification = confirmEmailVerification;
-

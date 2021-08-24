@@ -16,12 +16,12 @@ const userSchema = new mongoose.Schema({
     unique: true,
   },
   avatar:{
-    type:String
+    type:String,
+    default:""
   },
 
   password: {
     type: String,
-    required: true,
   },
 
   role: {
@@ -33,6 +33,11 @@ const userSchema = new mongoose.Schema({
     type:Boolean,
     default:false,
     required:true
+  },
+
+  social_id:{
+    type:String,
+  
   }
 });
 
@@ -59,9 +64,10 @@ function validateUser(userData) {
   return Joi.object({
     name: Joi.string().min(5).required(),
     email: Joi.string().required().email(),
-    password: Joi.string().required(),
+    password: Joi.string(),
     role: Joi.string().min(3),
-    avatar:Joi.string()
+    avatar:Joi.string(),
+    social_id:Joi.string()
   }).validate(userData);
 }
 
@@ -71,9 +77,10 @@ function validateUpdateUser(updateData) {
     email: Joi.string().email(),
     password: Joi.string(),
     role: Joi.string().min(3),
-    avatar:Joi.string()
+    avatar:Joi.string(),
+    social_id:Joi.string()
   })
-    .or("name", "email", "password", "role","avatar")
+    .or("name", "email", "password", "role","avatar","social_id")
     .validate(updateData);
 }
 
