@@ -78,9 +78,26 @@ async function getModule(id) {
       .populate("creator", "-password -__v")
       .select({ __v: 0 })
       .then((document) => {
+        if(!document) reject({code:404,error:"Nous n'avons pas pu trouver ce module"})
+
         resolve(document);
       })
       .catch((err) => reject(err));
+  });
+}
+
+async function getModuleByTitle(title="") {
+  console.log("title is", title);
+  return new Promise((resolve, reject) => {
+
+    SafiraModule.findOne({$text: { $search: `\"${title}\"`, $caseSensitive :false }})
+      .populate("creator", "-password -__v")
+      .select({ __v: 0 })
+      .then((document) => {
+        if(!document) reject({code:404,error:"Nous n'avons pas pu trouver ce module"})
+        else resolve(document);
+      })
+      .catch((err) => reject({code:500, error:err.toString()}));
   });
 }
 
@@ -409,3 +426,4 @@ exports.likeModule = likeModule;
 exports.unlikeModule = unlikeModule;
 exports.viewModule = viewModule;
 exports.rateModule = rateModule;
+exports.getModuleByTitle = getModuleByTitle;

@@ -1,7 +1,6 @@
 const mongoose = require("mongoose");
 const Joi = require("joi");
 const { User } = require("./User");
-const { Double } = require("mongodb");
 
 const safiraModuleSchema = new mongoose.Schema({
   title: {
@@ -93,6 +92,8 @@ const safiraModuleSchema = new mongoose.Schema({
     default: true,
   },
 });
+
+safiraModuleSchema.index({title: 'text'});
 
 const SafiraModule = mongoose.model("SafiraModule", safiraModuleSchema);
 

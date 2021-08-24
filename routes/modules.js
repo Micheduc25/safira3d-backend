@@ -5,6 +5,7 @@ const config = require("config");
 const {
   getAllModules,
   getModule,
+  getModuleByTitle,
   addModule,
   updateModule,
   deleteModule,
@@ -14,6 +15,8 @@ const {
   viewModule,
   rateModule,
 } = require("../controllers/ModuleController");
+
+const { isValidObjectId } = require("../utils/helperFunctions");
 
 const Joi = require("joi");
 const auth = require("../middleware/auth");
@@ -35,19 +38,21 @@ router.get("/", authOrReadonly, async (req, res) => {
 });
 
 router.get("/:id", authOrReadonly, async (req, res) => {
-  const { error } = Joi.string().min(1).validate(req.params.id);
+  const isIdValid = isValidObjectId(req.params.id);
 
-  if (!error) {
-    try {
-      const module = await getModule(req.params.id);
+  try {
+    let module;
+    if (isIdValid) module = await getModule(req.params.id);
+    else {
+      const title = req.params.id;
 
-      if (module) res.send(module);
-      else res.status(404).send("could not find module");
-    } catch (err) {
-      res.status(500).send(err);
+      module = await getModuleByTitle(title.replace(/-/g, " "));
     }
-  } else {
-    res.status(400).send("The given id is invalid");
+
+    if (module) res.send(module);
+    else res.status(404).send("could not find module");
+  } catch (err) {
+    res.status(err.code).send(err.error);
   }
 });
 
@@ -119,7 +124,7 @@ router.put("/:id", [auth, admin, imagesUpload], async (req, res) => {
 
       //remove the port later
       let filePath =
-      "https://"+
+        "https://" +
         host +
         (process.env.NODE_ENV === "development" ? ":" + process.env.PORT : "") +
         "/public/module_images/";
