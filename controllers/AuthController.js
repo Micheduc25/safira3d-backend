@@ -336,3 +336,5 @@ exports.resetPassword = resetPassword;
 exports.confirmPasswordReset = confirmPasswordReset;
 exports.sendEmailVerifyCode = sendEmailVerifyCode;
 exports.confirmEmailVerification = confirmEmailVerification;
+exports.socialSignup = socialSignup;
+exports.socialLogin = socialLogin;

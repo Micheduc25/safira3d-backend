@@ -7,6 +7,8 @@ const {
   loginUser,
   resetPassword,
   confirmPasswordReset,
+  socialLogin,
+  socialSignup
 } = require("../controllers/AuthController");
 router.post("/login", async (req, res) => {
   try {
@@ -18,6 +20,25 @@ router.post("/login", async (req, res) => {
     res.status(err.code).send(err.error);
   }
 });
+
+router.post("social-login",  async (req, res) => {
+  try {
+    const result = await socialLogin(req.body);
+    res.send(result);
+  } catch (err) {
+    console.log("error is =====>", err);
+    res.status(err.code).send(err.error);
+  }
+} )
+router.post("social-signup",  async (req, res) => {
+  try {
+    const result = await socialSignup(req.body);
+    res.send(result);
+  } catch (err) {
+    console.log("error is =====>", err);
+    res.status(err.code).send(err.error);
+  }
+} )
 
 router.get("/me", auth, async (req, res) => {
   try {
