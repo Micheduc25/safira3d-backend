@@ -119,7 +119,7 @@ async function socialLogin(userData) {
           code: 404,
           error: "L'utilisateur n'existe pas dans la base de données",
         });
-        
+
       const token = user.generateAuthToken();
 
       resolve({
@@ -157,7 +157,7 @@ async function resetPassword(email, newpassword) {
           button: {
             color: "#22BC66", // Optional action button color
             text: "Reinitialiser Mot de Passe",
-            link: `http://locahost:${process.env.PORT}/api/auth/password/confirm-reset?code=${code}&email=${email}`,
+            link: `${process.env.SERVER_URL}/api/auth/password/confirm-reset?code=${code}&email=${email}`,
           },
         },
         outro:
