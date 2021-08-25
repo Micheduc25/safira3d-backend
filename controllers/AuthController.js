@@ -114,6 +114,12 @@ async function socialLogin(userData) {
 
     try {
       const user = await User.findOne({ social_id });
+      if (!user)
+        return reject({
+          code: 404,
+          error: "L'utilisateur n'existe pas dans la base de données",
+        });
+        
       const token = user.generateAuthToken();
 
       resolve({
@@ -122,7 +128,7 @@ async function socialLogin(userData) {
         token: token,
       });
     } catch (err) {
-      reject({code:500, error:err});
+      reject({ code: 500, error: err });
     }
   });
 }
