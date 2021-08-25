@@ -21,7 +21,7 @@ router.post("/login", async (req, res) => {
   }
 });
 
-router.post("social-login",  async (req, res) => {
+router.post("/social-login",  async (req, res) => {
   try {
     const result = await socialLogin(req.body);
     res.send(result);
@@ -30,7 +30,7 @@ router.post("social-login",  async (req, res) => {
     res.status(err.code).send(err.error);
   }
 } )
-router.post("social-signup",  async (req, res) => {
+router.post("/social-signup",  async (req, res) => {
   try {
     const result = await socialSignup(req.body);
     res.send(result);
